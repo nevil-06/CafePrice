@@ -12,7 +12,7 @@ public class DataValidation {
 
     public static void main(String[] args){
 
-        String test = "Arnab()()Prerna;';'HEHE;;";
+        String test = "Arnab()TEST;;Rsseo)";
         String[] res = regexValidate(test);
 
         for(String s: res){
