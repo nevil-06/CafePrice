@@ -1,4 +1,5 @@
 import java.io.*;
+import java.text.Normalizer;
 import java.util.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -69,9 +70,66 @@ public class mycrawl {
 		Document doc = Jsoup.parse(inputFile, null);
 		
 		//String els = doc.select("p").get(3).text(); // getting the text of the 3rd indexed paragraph out of all <p> elements
-		String ele = doc.getElementsByClass("menu-item").get(1).getElementsByClass("menu-item-price-top").text();
+//		String ele = doc.getElementsByClass("menu-item").get(1).getElementsByClass("menu-item-price-top").text();
+		Element sec = doc.getElementsByClass("sqs-block menu-block sqs-block-menu").get(0);
+		
+		List<Element> dishes = sec.getElementsByClass("menu-item");
+
+		HashMap<String, Set<String>> ingr_to_dish = new HashMap<String, Set<String>>();
+		HashMap<String, Float> dish_to_price = new HashMap<String, Float>();
+		
+		for(Element e1: dishes) {
+			String dish = e1.getElementsByClass("menu-item-title").text();
+			dish = Normalizer.normalize(dish, Normalizer.Form.NFD);
+			dish = dish.replaceAll("[^\\p{ASCII}]", "");
+			
+			// TBD: need to add data validation step for valid dish name
+
+			//System.out.println(dish);
+			
+			String[] res = e1.getElementsByClass("menu-item-description").text().split("\\s*[^a-zA-Z]+\\s*");
+
+			// need to add data validation step for valid price
+			String price = e1.getElementsByClass("menu-item-price-top").text().substring(1);
+			System.out.println(price);
+
+			// mapping dish to price
+			dish_to_price.put(dish, Float.parseFloat(dish));
+			
+			// loop for iterating ingredients and mapping it to the dish
+			for(String s: res)
+			{
+				//TBD: stopword functionality
+				String ing = s.trim().toLowerCase();
+				if(ingr_to_dish.get(ing)==null) {
+					Set<String> newlist = new HashSet<String>();
+					newlist.add(dish);
+					ingr_to_dish.put(ing, newlist);
+				}
+				else {
+					//assuming new dish name
+					ingr_to_dish.get(ing).add(dish);
+				}
+//				System.out.println(s.trim() + ' ');
+			}
+			
+//			System.out.println();
+//			System.out.println(e1.getElementsByClass("menu-item-description").text().split("\\s*[a-zA-Z]+\\s*"));
+//			System.out.println(e1.getElementsByClass("menu-item-price-top").text());
+		}
+		
+		for (Map.Entry<String, Set<String>> set : ingr_to_dish.entrySet()) {
+			 
+            // Printing all elements of a Map
+            System.out.print(set.getKey() + " dishes are: ");
+            System.out.print(set.getKey() + " size is : " + set.getValue().size() + " and dishes: ");
+            for(String s: set.getValue()) {
+            	System.out.print(s + " , ");
+            }
+            System.out.println();
+        }
 		// should print the price of item
-		System.out.println(ele);
+//		System.out.println(sec);
 		
 	}
 
