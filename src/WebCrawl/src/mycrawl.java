@@ -1,3 +1,5 @@
+import datavalidate.datavalidation;
+import stopwords.manageStopwords;
 import java.io.*;
 import java.text.Normalizer;
 import java.util.*;
@@ -12,6 +14,7 @@ import org.jsoup.*;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
 
 public class mycrawl {
 
@@ -48,7 +51,8 @@ public class mycrawl {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		// TODO Auto-generated method stub
+		
+//		----------------- CRAWLING
 		
 		File file = new File("C:\\Users\\Arnab\\Downloads\\edgedriver_win64\\msedgedriver.exe");
 		System.setProperty("webdriver.edge.driver", file.getAbsolutePath());
@@ -59,15 +63,22 @@ public class mycrawl {
 				"C:\\Users\\Arnab\\OneDrive\\Desktop\\UoW\\Subject Materials\\ACC\\Eclipse_WS\\CrawlProj\\src\\medinacafeHTML\\"
 		};
 		
-
 //		crawlWebsite(urls[0], save_path[0]);
 //		crawlWebsite(urls[1], save_path[1], "CafeMarch21");
 //		crawlWebsite(urls[2], save_path[2], "bipartisan");
 		
+//		-----------------------------------------------------------------------
 		// read the HTML file
 		File inputFile = new File("C:\\Users\\Arnab\\OneDrive\\Desktop\\UoW\\Subject Materials\\ACC\\Eclipse_WS\\CrawlProj\\src\\medinacafeHTML\\medinacafe.html");
 		// parse the file by use of Jsoup library
 		Document doc = Jsoup.parse(inputFile, null);
+		
+		// ADDING STOPWORDS ( decide between stopwords or non-stopwords/ingredients )
+		
+		manageStopwords stopword_tree = new manageStopwords();
+		// loop to iterate stopwords.txt and insert all stopwords in it
+		
+		//		READING BRUNCH SECTION
 		
 		//String els = doc.select("p").get(3).text(); // getting the text of the 3rd indexed paragraph out of all <p> elements
 //		String ele = doc.getElementsByClass("menu-item").get(1).getElementsByClass("menu-item-price-top").text();
@@ -79,50 +90,75 @@ public class mycrawl {
 		HashMap<String, Float> dish_to_price = new HashMap<String, Float>();
 		
 		for(Element e1: dishes) {
+			
+			datavalidation o = new datavalidation();
+			
 			String dish = e1.getElementsByClass("menu-item-title").text();
+			
 			dish = Normalizer.normalize(dish, Normalizer.Form.NFD);
 			dish = dish.replaceAll("[^\\p{ASCII}]", "");
 			
-			// TBD: need to add data validation step for valid dish name
-
+			if(!o.checkDishName(dish)) {
+//				System.out.println("Bad name: " + dish);
+				continue;
+			}
+			
 			//System.out.println(dish);
 			
 			String[] res = e1.getElementsByClass("menu-item-description").text().split("\\s*[^a-zA-Z]+\\s*");
 
 			// need to add data validation step for valid price
-			String price = e1.getElementsByClass("menu-item-price-top").text().substring(1);
+			String price = e1.getElementsByClass("menu-item-price-top").text();
 			System.out.println(price);
-
+			
+			if(!o.checkPrice(price)) {
+//				System.out.println("Bad price: " + price);
+				continue;
+			}
+			
+//			System.out.println("Dish name: " + dish);
+//			System.out.println("Dish price: " + price);
+			
 			// mapping dish to price
-			dish_to_price.put(dish, Float.parseFloat(dish));
+			dish_to_price.put(dish, Float.parseFloat(price.substring(1)));
 			
 			// loop for iterating ingredients and mapping it to the dish
 			for(String s: res)
 			{
-				//TBD: stopword functionality
+				
 				String ing = s.trim().toLowerCase();
-				if(ingr_to_dish.get(ing)==null) {
-					Set<String> newlist = new HashSet<String>();
-					newlist.add(dish);
-					ingr_to_dish.put(ing, newlist);
+				
+				//TB Added: stopword functionality by using search() function
+				
+				if(ing.length()>0) // to avoid empty ingredients
+				{
+					if(ingr_to_dish.get(ing)==null) {
+						Set<String> newlist = new HashSet<String>();
+						newlist.add(dish);
+						ingr_to_dish.put(ing, newlist);
+					}
+					else {
+						//assuming new dish name
+						ingr_to_dish.get(ing).add(dish);
+					}
 				}
-				else {
-					//assuming new dish name
-					ingr_to_dish.get(ing).add(dish);
-				}
-//				System.out.println(s.trim() + ' ');
+//					System.out.println(s.trim() + ' ');
 			}
+			
 			
 //			System.out.println();
 //			System.out.println(e1.getElementsByClass("menu-item-description").text().split("\\s*[a-zA-Z]+\\s*"));
 //			System.out.println(e1.getElementsByClass("menu-item-price-top").text());
 		}
 		
+		System.out.println("Size of map: " + dish_to_price.size());
+		
 		for (Map.Entry<String, Set<String>> set : ingr_to_dish.entrySet()) {
 			 
             // Printing all elements of a Map
             System.out.print(set.getKey() + " dishes are: ");
-            System.out.print(set.getKey() + " size is : " + set.getValue().size() + " and dishes: ");
+            System.out.print(set.getKey().length() + " is dish size ");
+            System.out.print(set.getKey() + " dishes size is : " + set.getValue().size() + " and dishes: ");
             for(String s: set.getValue()) {
             	System.out.print(s + " , ");
             }
