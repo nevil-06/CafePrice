@@ -1,5 +1,8 @@
 package stopwords;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 
 public class manageStopwords {
@@ -25,6 +28,19 @@ public class manageStopwords {
     // Get the height of a node
     private int height(Node node) {
         return (node != null) ? node.height : 0;
+    }
+    
+    // New method to get the height of the AVL tree
+    public int getHeight() {
+        return getHeight(root);
+    }
+
+    // Helper method to get the height of a node
+    private int getHeight(Node node) {
+        if (node == null) {
+            return 0;
+        }
+        return node.height;
     }
 
     // Get the balance factor of a node
@@ -151,6 +167,20 @@ public class manageStopwords {
         }
     }
     
+    public static manageStopwords insertStopwords(String filePath, manageStopwords stopword_tree) throws IOException{
+    	// ADDING STOPWORDS ( decide between stopwords or non-stopwords/ingredients )
+		
+        String line;
+        BufferedReader br = new BufferedReader(new FileReader(filePath));
+        		
+        // Read lines from the file using BufferedReader
+        while ((line = br.readLine()) != null) {
+        	stopword_tree.insert(line);
+        }
+        
+        return stopword_tree;
+        
+    }
     // Example usage
     public static void main(String[] args) {
     	manageStopwords avlTree = new manageStopwords();

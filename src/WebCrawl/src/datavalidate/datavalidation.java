@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 public class datavalidation {
 
 	public boolean checkPrice(String price) {
-		if(price.matches("\\$\\d{2}")) {
+		if(price.matches("^\\$\\d+(\\.\\d+)?$")) {
 			return true;
 		}
 		else
@@ -13,7 +13,7 @@ public class datavalidation {
 	}
 	
 	public boolean checkDishName(String dishname) {
-		if(dishname.matches("^[a-zA-Z][a-zA-Z0-9 *,:]*$")) {	
+		if(dishname.matches("^[a-zA-Z][a-zA-Z0-9 *,:-;+-]*$")) {	
 			return true;
 		}
 		else
