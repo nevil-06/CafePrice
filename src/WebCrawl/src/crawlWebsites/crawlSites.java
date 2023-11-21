@@ -1,9 +1,14 @@
 package crawlWebsites;
 
 import java.io.*;
+import java.time.Duration;
 import java.util.*;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 
 public class crawlSites {
@@ -35,9 +40,13 @@ public class crawlSites {
 		WebDriver driver = new EdgeDriver();
 		JavascriptExecutor js = (JavascriptExecutor)driver;
 		driver.navigate().to(url);
+		if(filename=="CafeMarch21") {
+			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(3));
+			WebElement closeButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("leadform-popup-close-7e667604-377d-4042-b637-6b3c6e403f73")));
+			closeButton.click();
+		}
 		String content = driver.getPageSource();
 		createFile(url, content, filename, save_path);
-		
 	}
 	
 	public static void main(String[] args) throws IOException {
@@ -49,14 +58,14 @@ public class crawlSites {
 		
 		String[] urls = {"https://earls.ca/locations/london/menu/","https://www.cafemarch21.com/lunch","https://www.medinacafe.com/"};
 		
-		String[] save_path = {"C:\\Users\\Arnab\\OneDrive\\Desktop\\UoW\\Subject Materials\\ACC\\Eclipse_WS\\CrawlProj\\src\\EarlsHTML\\",
-				"C:\\Users\\Arnab\\OneDrive\\Desktop\\UoW\\Subject Materials\\ACC\\Eclipse_WS\\CrawlProj\\src\\CafeMarch21HTML\\",
-				"C:\\Users\\Arnab\\OneDrive\\Desktop\\UoW\\Subject Materials\\ACC\\Eclipse_WS\\CrawlProj\\src\\medinacafeHTML\\"
+		String[] save_path = {"C:\\Users\\Arnab\\OneDrive\\Desktop\\UoW\\Subject Materials\\ACC\\Eclipse_WS\\CrawlProj\\src\\crawlWebsites\\CrawlResult\\Earls\\",
+				"C:\\Users\\Arnab\\OneDrive\\Desktop\\UoW\\Subject Materials\\ACC\\Eclipse_WS\\CrawlProj\\src\\crawlWebsites\\CrawlResult\\Cafe21\\",
+				"C:\\Users\\Arnab\\OneDrive\\Desktop\\UoW\\Subject Materials\\ACC\\Eclipse_WS\\CrawlProj\\src\\crawlWebsites\\CrawlResult\\Medina\\"
 		};
 		
-		crawlWebsite(urls[0], save_path[0], "Earls");
+//		crawlWebsite(urls[2], save_path[2], "medinacafe");
+//		crawlWebsite(urls[0], save_path[0], "Earls");
 		crawlWebsite(urls[1], save_path[1], "CafeMarch21");
-		crawlWebsite(urls[2], save_path[2], "medinacafe");
 		
 	}
 }

@@ -12,6 +12,14 @@ public class datavalidation {
 			return false;
 	}
 	
+	public boolean checkexpPrice(String price) {
+		if(price.matches("^\\d+(\\.\\d+)?$")) {
+			return true;
+		}
+		else
+			return false;
+	}
+	
 	public boolean checkDishName(String dishname) {
 		if(dishname.matches("^[a-zA-Z][a-zA-Z0-9 *,:-;+-]*$")) {	
 			return true;
