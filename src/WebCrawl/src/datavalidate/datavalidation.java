@@ -21,7 +21,23 @@ public class datavalidation {
 	}
 	
 	public boolean checkDishName(String dishname) {
-		if(dishname.matches("^[a-zA-Z][a-zA-Z0-9 *,:-;+-]*$")) {	
+		if(dishname.matches("^[a-zA-Z][a-zA-Z0-9 ()*,:/-;+-]*$")) {	
+			return true;
+		}
+		else
+			return false;
+	}
+	
+	public boolean checkIngInput(String dishname) {
+		if(dishname.matches("[a-zA-Z]+")) {	
+			return true;
+		}
+		else
+			return false;
+	}
+	
+	public boolean checkBevName(String dishname) {
+		if(dishname.matches("^[a-zA-Z][a-zA-Z0-9 *,:-;+-.']*$")) {	
 			return true;
 		}
 		else

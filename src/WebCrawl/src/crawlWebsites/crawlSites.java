@@ -56,16 +56,18 @@ public class crawlSites {
 		File file = new File("C:\\Users\\Arnab\\Downloads\\edgedriver_win64\\msedgedriver.exe");
 		System.setProperty("webdriver.edge.driver", file.getAbsolutePath());
 		
-		String[] urls = {"https://earls.ca/locations/london/menu/","https://www.cafemarch21.com/lunch","https://www.medinacafe.com/"};
+//		String[] urls = {"https://earls.ca/locations/london/menu/","https://www.cafemarch21.com/lunch","https://www.medinacafe.com/"};
+		String[] urls = {"https://thearch.ca/menu/","https://www.cafemarch21.com/lunch","https://www.medinacafe.com/"};
 		
-		String[] save_path = {"C:\\Users\\Arnab\\OneDrive\\Desktop\\UoW\\Subject Materials\\ACC\\Eclipse_WS\\CrawlProj\\src\\crawlWebsites\\CrawlResult\\Earls\\",
+		String[] save_path = {"C:\\Users\\Arnab\\OneDrive\\Desktop\\UoW\\Subject Materials\\ACC\\Eclipse_WS\\CrawlProj\\src\\crawlWebsites\\CrawlResult\\Thearch\\",
 				"C:\\Users\\Arnab\\OneDrive\\Desktop\\UoW\\Subject Materials\\ACC\\Eclipse_WS\\CrawlProj\\src\\crawlWebsites\\CrawlResult\\Cafe21\\",
 				"C:\\Users\\Arnab\\OneDrive\\Desktop\\UoW\\Subject Materials\\ACC\\Eclipse_WS\\CrawlProj\\src\\crawlWebsites\\CrawlResult\\Medina\\"
 		};
 		
-//		crawlWebsite(urls[2], save_path[2], "medinacafe");
+		crawlWebsite(urls[2], save_path[2], "medinacafe");
 //		crawlWebsite(urls[0], save_path[0], "Earls");
-		crawlWebsite(urls[1], save_path[1], "CafeMarch21");
+//		crawlWebsite(urls[1], save_path[1], "CafeMarch21");
+//		crawlWebsite(urls[0], save_path[0], "TheArch");
 		
 	}
 }

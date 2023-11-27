@@ -12,12 +12,12 @@ import org.jsoup.nodes.Element;
 public class medina {
 
 	public HashMap<String, Set<String>> app_ingr_to_dish = new HashMap<String, Set<String>>();
-	public HashMap<String, Float> app_dish_to_price = new HashMap<String, Float>();
+	public HashMap<String, Object[]> app_dish_to_price = new HashMap<String, Object[]>();
 	public HashMap<String, Set<String>> mcr_ingr_to_dish = new HashMap<String, Set<String>>();
-	public HashMap<String, Float> mcr_dish_to_price = new HashMap<String, Float>();
+	public HashMap<String, Object[]> mcr_dish_to_price = new HashMap<String, Object[]>();
 	public HashMap<String, Set<String>> bev_ingr_to_dish = new HashMap<String, Set<String>>();
-	public HashMap<String, Float> bev_dish_to_price = new HashMap<String, Float>();
-	private manageStopwords stopword_tree;
+	public HashMap<String, Object[]> bev_dish_to_price = new HashMap<String, Object[]>();
+	public manageStopwords stopword_tree;
 	
 	public medina() {
 		setStopword_tree(new manageStopwords());
@@ -47,7 +47,7 @@ public class medina {
 			
 			//System.out.println(dish);
 			
-			String[] res = e1.getElementsByClass("menu-item-title").text().split("\\s*[^a-zA-Z]+\\s*");
+			String[] res = dish.split("\\s*[^a-zA-Z]+\\s*");
 
 			// need to add data validation step for valid price
 			String price = e1.getElementsByClass("menu-item-price-top").text();
@@ -62,13 +62,17 @@ public class medina {
 //			System.out.println("Dish price: " + price);
 			
 			// mapping dish to price
-			app_dish_to_price.put(dish, Float.parseFloat(price.substring(1)));
+			app_dish_to_price.put(dish, new Object[] {Float.parseFloat(price.substring(1)), "MEDINA CAFE"});
 			
 			// loop for iterating ingredients and mapping it to the dish
 			for(String s: res)
 			{
-				
 				String ing = s.trim().toLowerCase();
+				List<String> check_plural = Arrays.asList("potatoes");
+
+				if(check_plural.contains(ing)) {
+					ing = ing.substring(0, ing.length()-2);
+				}
 				
 				//TB Added: stopword functionality by using search() function
 				
@@ -116,11 +120,16 @@ public class medina {
 			dish = Normalizer.normalize(dish, Normalizer.Form.NFD);
 			dish = dish.replaceAll("[^\\p{ASCII}]", "");
 			
+//			System.out.println("Dish: " + dish);
+			
 			if(!o.checkDishName(dish)) {
 				continue;
 			}
 			
-			String[] res = e1.getElementsByClass("menu-item-description").text().split("\\s*[^a-zA-Z]+\\s*");
+			String dish_desc = e1.getElementsByClass("menu-item-description").text();
+			dish_desc = Normalizer.normalize(dish_desc, Normalizer.Form.NFD);
+			dish_desc = dish_desc.replaceAll("[^\\p{ASCII}]", "");
+			String[] res = dish_desc.split("\\s*[^a-zA-Z]+\\s*");
 
 			// need to add data validation step for valid price
 			String price = e1.getElementsByClass("menu-item-price-top").text();
@@ -132,12 +141,21 @@ public class medina {
 //			System.out.println(price);
 
 			// mapping dish to price
-			mcr_dish_to_price.put(dish, Float.parseFloat(price.substring(1)));
+			mcr_dish_to_price.put(dish, new Object[] {Float.parseFloat(price.substring(1)), "MEDINA CAFE"});
 			
 			// loop for iterating ingredients and mapping it to the dish
 			for(String s: res)
 			{
 				String ing = s.trim().toLowerCase();
+				List<String> check_plural = Arrays.asList("eggs","onions","mushrooms","tomatoes","peppers","olives");
+				List<String> check_plural_2 = Arrays.asList("potatoes");
+
+				if(check_plural.contains(ing)) {
+					ing = ing.substring(0, ing.length()-1);
+				}
+				else if(check_plural_2.contains(ing)) {
+					ing = ing.substring(0, ing.length()-2);
+				}
 				
 				//TB Added: stopword functionality by using search() function
 				
@@ -159,16 +177,138 @@ public class medina {
 //		System.out.println("Size of map: " + mcr_dish_to_price.size());
 
 //		for (Map.Entry<String, Set<String>> set : mcr_ingr_to_dish.entrySet()) {
-//			 
-//            // Printing all elements of a Map
+////			 
+////            // Printing all elements of a Map
 //            System.out.print(set.getKey() + " dishes are: ");
-//            System.out.print(set.getKey().length() + " is dish size ");
-//            System.out.print(set.getKey() + " dishes size is : " + set.getValue().size() + " and dishes: ");
+////            System.out.print(set.getKey().length() + " is dish size ");
+////            System.out.print(set.getKey() + " dishes size is : " + set.getValue().size() + " and dishes: ");
 //            for(String s: set.getValue()) {
 //            	System.out.print(s + " , ");
 //            }
 //            System.out.println();
 //        }		
+	}
+	
+	public void parseBeverages(Document doc, medina obj) {
+		
+		Element sec = doc.getElementsByClass("sqs-block menu-block sqs-block-menu").get(3);
+		
+		List<Element> dishes = sec.getElementsByClass("menu-item");
+
+//		System.out.println("Mysize: " + dishes.size());
+				
+		for(Element e1: dishes) {
+			
+			datavalidation o = new datavalidation();
+			
+			String dish = e1.getElementsByClass("menu-item-title").text();
+			
+			dish = Normalizer.normalize(dish, Normalizer.Form.NFD);
+			dish = dish.replaceAll("[^\\p{ASCII}]", "");
+			
+			if(!o.checkBevName(dish)) {
+//				System.out.println("Bad name: " + dish);
+				continue;
+			}
+			
+//			System.out.print(dish);
+			
+			String[] res = e1.getElementsByClass("menu-item-description").text().split("\\s*[^a-zA-Z]+\\s*");
+			
+			ArrayList<String> res_updated = new ArrayList<>();
+			
+			// insert to check if it comes out empty due to stopwords
+			for(String s: res) {
+				String ing = s.trim().toLowerCase();
+				if(ing.length()>0 && !obj.stopword_tree.search(ing)) // to avoid empty ingredients
+				{
+					res_updated.add(ing);
+				}
+			}
+			
+			// if empty due to no description available or empty due to all stopwords then pick from option
+			if(res_updated.size()==0) {
+				res = e1.getElementsByClass("menu-item-option").text().split("\\s*[^a-zA-Z]+\\s*");
+				
+				res_updated = new ArrayList<>();
+				
+				// insert to check if it comes out empty due to stopwords
+				for(String s: res) {
+					String ing = s.trim().toLowerCase();
+					if(ing.length()>0 && !obj.stopword_tree.search(ing)) // to avoid empty ingredients
+					{
+						res_updated.add(ing);
+					}
+				}
+				
+				if(res_updated.size()==0) {
+					res = dish.split("\\s*[^a-zA-Z]+\\s*");
+				}
+				else {
+					res = res_updated.toArray(new String[0]);
+				}
+			}
+			else {
+				res = res_updated.toArray(new String[0]);
+			}
+			
+			// need to add data validation step for valid price
+			String price = e1.getElementsByClass("menu-item-price-top").text();
+//			System.out.println(price);
+			
+			if(!o.checkPrice(price)) {
+//				System.out.println("Bad price: " + price);
+				continue;
+			}
+			
+//			System.out.print("Dish name: " + dish + " ");
+//			System.out.println(price);
+			
+			// mapping dish to price
+			bev_dish_to_price.put(dish, new Object[] {Float.parseFloat(price.substring(1)), "MEDINA CAFE"});
+			
+			// loop for iterating ingredients and mapping it to the dish
+			for(String s: res)
+			{
+				
+				String ing = s.trim().toLowerCase();
+				
+				//TB Added: stopword functionality by using search() function
+				
+				if(ing.length()>0 && !obj.stopword_tree.search(ing)) // to avoid empty ingredients
+				{
+					if(bev_ingr_to_dish.get(ing)==null) {
+						Set<String> newlist = new HashSet<String>();
+						newlist.add(dish);
+						bev_ingr_to_dish.put(ing, newlist);
+					}
+					else {
+						//assuming new dish name
+						bev_ingr_to_dish.get(ing).add(dish);
+					}
+				}
+//					System.out.println(s.trim() + ' ');
+			}
+		}
+		
+//		for (Map.Entry<String, Set<String>> set : bev_ingr_to_dish.entrySet()) {
+//			 
+//            // Printing all elements of a Map
+//            System.out.print(set.getKey() + " Beverages are: ");
+//            System.out.print(set.getKey().length() + " is Beverages size ");
+//            for(String s: set.getValue()) {
+//            	System.out.print(s + " , ");
+//            }
+//            System.out.println();
+//        }
+		
+//		for (Map.Entry<String, Object[]> set : bev_dish_to_price.entrySet()) {
+//			 
+//           // Printing all elements of a Map
+//           System.out.print(set.getKey() + " Price is: $" + set.getValue()[0]);
+//           System.out.print(set.getKey().length() + " is Beverages size ");
+//           System.out.println();
+//       }
 	}
 	
 	public manageStopwords insertStopwords(medina obj, String filePath) throws IOException {
@@ -195,8 +335,11 @@ public class medina {
 	
 	public static void main(String[] args) throws IOException {
 		
+//		HashMap<String, Object[]> t = new HashMap();
+//		t.put("a", new Object[] {10.5f, "Cafe1"});
+//		System.out.println(t.get("a")[0]);
 		// read the HTML file
-		File inputFile = new File("C:\\Users\\Arnab\\OneDrive\\Desktop\\UoW\\Subject Materials\\ACC\\Eclipse_WS\\CrawlProj\\src\\medinacafeHTML\\medinacafe.html");
+		File inputFile = new File("C:\\Users\\Arnab\\OneDrive\\Desktop\\UoW\\Subject Materials\\ACC\\Eclipse_WS\\CrawlProj\\src\\crawlWebsites\\CrawlResult\\Medina\\medinacafe.html");
 		// parse the file by use of Jsoup library
 		Document doc = Jsoup.parse(inputFile, null);
 		
@@ -212,9 +355,11 @@ public class medina {
         
         System.out.println("Height of the AVL tree: " + obj.getStopword_tree().getHeight());
         
-        obj.parseAppetizers(doc, obj);
+//        obj.parseAppetizers(doc, obj);
         
         obj.parseMainCourse(doc, obj);
+        
+//        obj.parseBeverages(doc, obj);
         
 		System.out.println("Size of map: " + obj.app_dish_to_price.size());
 //		
