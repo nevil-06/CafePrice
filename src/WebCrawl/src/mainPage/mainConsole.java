@@ -52,6 +52,8 @@ public class mainConsole {
 		    
 		    m_obj.createStopwords(m_obj, filePath);
 			
+		    System.out.println("Created AVL tree for stopwords...");
+		    
 	//      obj.stopword_tree.printTree();
 	      
 //		    System.out.println("Height of the AVL tree: " + m_obj.getStopword_tree().getHeight());
@@ -145,7 +147,7 @@ public class mainConsole {
 			if (scanner1.hasNextInt()) {
 	            // Read the integer
 	            category = scanner1.nextInt();
-	            if(category<1 || category>3) {
+	            if(category<1 || category>2) {
 	            	System.out.println("Invalid integer input. Please enter valid option number (1 or 2)");
 	            	res = false;
 	            }
@@ -159,7 +161,10 @@ public class mainConsole {
 				if(display>0)
 					System.out.println("Invalid non-integer input. Please enter valid option number (1 or 2)");
 				else
+				{
+					System.out.println("Invalid non-integer input. Please enter valid option number (1 or 2)");
 					display+=1;
+				}
 	        }
 		}while(!res);
 		
@@ -190,6 +195,8 @@ public class mainConsole {
 		    bst_arch.createBSTFromHashMaps(a_obj.bev_ingr_to_dish);
 	    }
 
+	    System.out.println("Created frequency count BST...");
+	    
 		String ing_input;
 		boolean ing_res = false;
 		
@@ -287,7 +294,10 @@ public class mainConsole {
     	        	int getSearchFreq = searchfreq.getFrequency(ing_input);
     	        	if(getSearchFreq>0) {
     	        		System.out.println();
-    	        		System.out.println("You have searched for this dish before " + getSearchFreq + " times.");
+    	        		System.out.println("-------------------------------------------------------------------------------------------------");
+    	        		System.out.println("HEY THERE!! You have searched for this dish before " + getSearchFreq + " times.");
+    	        		System.out.println("-------------------------------------------------------------------------------------------------");
+    	        		System.out.println();
     	        	}
     	        	searchfreq.insert(ing_input);
     	        	
@@ -330,15 +340,19 @@ public class mainConsole {
 //                System.out.println("String value: " + exp_price_str);
 
                 if (!o.checkexpPrice(exp_price_str)) {
-                    System.out.println("Invalid valid price input.");
+                    System.out.println("Invalid price input. Please enter an expected price greater than 0.");
                     res = false;
                 } else {
-                    res = true;
+                	if(exp_price>0)
+                		res = true;
+                	else {
+                		System.out.println("Invalid price input. Please enter an expected price greater than 0.");
+                	}
                 }
             } catch (NumberFormatException e) {
                 // Handle the NumberFormatException
             	if(display>0)
-            		System.out.println("Invalid non-float input. Please enter a valid price.");
+            		System.out.println("Invalid non-float input. Please enter an expected price greater than 0.");
             	else
             		display+=1;
                 res = false;
@@ -391,6 +405,7 @@ public class mainConsole {
 			System.out.println("In Appetizers, find below list of the few top keywords across dishes: ");
 			System.out.println();
 			System.out.println("potato, egg, cookie, brownie, croissant, salad, bacon..");
+			System.out.println();
 			
 			dishRecommendation(m_obj, c_obj, a_obj, scanner1, category, searchfreq, exp_price);
 
@@ -402,6 +417,7 @@ public class mainConsole {
 			System.out.println("In Mains, find below list of the few top keywords across dishes: ");
 			System.out.println();
 			System.out.println("egg, chicken, salmon, beef, onion, potato, ramen, duck, cheese, pancake..");
+			System.out.println();
 			
 			dishRecommendation(m_obj, c_obj, a_obj, scanner1, category, searchfreq, exp_price);
 		}
@@ -409,6 +425,7 @@ public class mainConsole {
 			System.out.println("In Beverages, find below list of the few top keywords across dishes: ");
 			System.out.println();
 			System.out.println("cappuchino, latte, tea, beer, lemonade,");
+			System.out.println();
 			
 			dishRecommendation(m_obj, c_obj, a_obj, scanner1, category, searchfreq, exp_price);
 		}
@@ -424,8 +441,6 @@ public class mainConsole {
 		System.out.print("\033[H\033[2J");  
 	    System.out.flush();
 		
-	    System.out.println("Crawling websites...");
-	    
 	    File file = new File("C:\\Users\\Arnab\\Downloads\\edgedriver_win64\\msedgedriver.exe");
 		System.setProperty("webdriver.edge.driver", file.getAbsolutePath());
 		
@@ -436,6 +451,12 @@ public class mainConsole {
 				"C:\\Users\\Arnab\\OneDrive\\Desktop\\UoW\\Subject Materials\\ACC\\Eclipse_WS\\CrawlProj\\src\\crawlWebsites\\CrawlResult\\Medina\\"
 		};
 		
+		System.out.println();
+		System.out.println("--------------------------------------------------------------------------------------------------------------");
+		System.out.println("---------------------WELCOME TO BUGBUSTERS CAFE DISH RECOMMENDATION-------------------------------------------");
+		System.out.println("--------------------------------------------------------------------------------------------------------------");
+		System.out.println();
+		
 		System.out.println("Do you wish to crawl?");
 		
 		Scanner scanner1 = new Scanner(System.in);
@@ -443,12 +464,15 @@ public class mainConsole {
 		int crawl_res = askUser(scanner1); // input variable
 		
 		if(crawl_res==1) {
+			System.out.println("Crawling websites...");
 			crawlSites.crawlWebsite(urls[0], save_path[0], "TheArch");
 			crawlSites.crawlWebsite(urls[1], save_path[1], "CafeMarch21");
 			crawlSites.crawlWebsite(urls[2], save_path[2], "medinacafe");
+			System.out.println("Crawling complete...");
 		}
 	    
-	    System.out.println("Parsing websites...");
+		System.out.println("Using saved HTML files for parsing...");
+	    System.out.println("Parsing websites and performing pattern matching & data validation using Regex within...");
 	    
 	    // call functions to crawl and parse
     	medina m_obj = new medina();
@@ -465,7 +489,15 @@ public class mainConsole {
 	    thearch a_obj = new thearch();
 	    parseTheArch(a_obj, m_obj);
 	    
+	    System.out.println("Created 2-level inverted index of ingredients to dishes and respective cafe...");
+	    System.out.println("Created list of stopwords...");
+	    System.out.println("Completed parsing websites...");
+	    System.out.println("Data validation completed...");
+	    System.out.println();
+	    
 	    createIngredientThesaurus(m_obj, c_obj, a_obj, 0);
+	    
+	    System.out.println("Created list of ingredients...");
 	    
 //	    int count = bst_medina.getCount("egg");
 //        System.out.println("Count of egg" + ": " + count);
@@ -474,11 +506,6 @@ public class mainConsole {
 //        System.out.println("Count of cookie" + ": " + count);
 	    
 //        System.exit(0);
-        
-		System.out.println();
-		System.out.println("--------------------------------------------------------------------------------------------------------------");
-		System.out.println("---------------------WELCOME TO BUGBUSTERS CAFE DISH RECOMMENDATION-------------------------------------------");
-		System.out.println("--------------------------------------------------------------------------------------------------------------");
 		
 		boolean searchDish = true;
 		int searchDish_res = 0;
@@ -519,10 +546,39 @@ public class mainConsole {
 			
 		}while(searchDish);
 		
+		System.out.println();
+		System.out.println("WE THANK YOU FOR USING OUR RECOMMENDATION ENGINE!! SEE YOU AGAIN!!");
+		System.out.println();
+		playSignOffAnimation();
+		
 		scanner1.close();
 		
 //		System.exit(0);
 		
 	}
+	
+	public static void playSignOffAnimation() {
+        for (int i = 3; i >= 0; i--) {
+        	clearScreen();
+            System.out.println("Exiting in " + i + " seconds...");
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        clearScreen();
+        System.out.println("Goodbye!");
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void clearScreen() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
 
 }

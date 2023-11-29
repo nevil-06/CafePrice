@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.text.Normalizer;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 public class thearch {
 
@@ -98,9 +99,20 @@ public class thearch {
 
 //		    System.out.println(dishName);
 		    
-		    boolean containsAppetizers = appetizersKeywords.stream().anyMatch(dishName::contains);
+		    final String dish2 = dishName;
+		 // Use regular expressions to find patterns
+	        boolean containsAppetizers = appetizersKeywords.stream()
+	                .anyMatch(keyword -> Pattern.compile("\\b" + Pattern.quote(keyword) + "\\b", Pattern.CASE_INSENSITIVE)
+	                        .matcher(dish2).find());
+	        
+	     // Use regular expressions to find patterns
+	        boolean containsMainCourse = mainCourseKeywords.stream()
+	                .anyMatch(keyword -> Pattern.compile("\\b" + Pattern.quote(keyword) + "\\b", Pattern.CASE_INSENSITIVE)
+	                        .matcher(dish2).find());
+	        
+//		    boolean containsAppetizers = appetizersKeywords.stream().anyMatch(dishName::contains);
 
-		    boolean containsMainCourse = mainCourseKeywords.stream().anyMatch(dishName::contains);
+//		    boolean containsMainCourse = mainCourseKeywords.stream().anyMatch(dishName::contains);
 
 		    String price = innerDiv.select("span").text().replace(" ","");
 

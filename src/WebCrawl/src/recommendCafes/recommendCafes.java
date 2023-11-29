@@ -29,7 +29,16 @@ public class recommendCafes {
     // Constructor to initialize the priority queue
     public recommendCafes() {
         // Using a custom comparator to prioritize dishes based on their prices
-        priorityQueue = new PriorityQueue<>((dish1, dish2) -> Float.compare(dish1.price, dish2.price));
+        priorityQueue = new PriorityQueue<>((dish1, dish2) -> {
+            int priceComparison = Float.compare(dish1.price, dish2.price);
+            
+            if (priceComparison == 0) {
+                // If prices are equal, compare by cafe name
+                return dish1.cafeName.compareTo(dish2.cafeName);
+            }
+
+            return priceComparison;
+        });
     }
 
     // Method to add a dish to the priority queue
@@ -172,6 +181,8 @@ public class recommendCafes {
     	System.out.println();
     	if(dishpop.size()==0) {
     		System.out.println("NO RECOMMENDATIONS BASED ON THE EXPECTED PRICE.");
+    		System.out.println("NO WORRIES! WE HAVE SUGGESTIONS FOR YOU, AS REFERENCE, BASED ON THE POPULARUTY OF THE INGREDIENT!");
+    		System.out.println("HOPE IT HELPS YOU IN THE FUTURE!");
     		System.out.println();
     		return;
     	}
@@ -189,6 +200,17 @@ public class recommendCafes {
     	}
     }
     
+    private void addDishesToQueue(String ing, Map<String, Set<String>> ingrToDish, Map<String, Object[]> dishToPrice, ingredientCounterBST bst, recommendCafes dishpop) {
+        if (ingrToDish.containsKey(ing) && ingrToDish.get(ing).size() > 0) {
+            for (String dish : ingrToDish.get(ing)) {
+                if (bst.getCount(ing) > 0) {
+                    Float pop = (float) bst.getCount(ing);
+                    dishpop.addDish(dish, (String) dishToPrice.get(dish)[1], -pop);
+                }
+            }
+        }
+    }
+    
     /*
      * Implements page/cafe ranking by using the price
      * 
@@ -197,101 +219,41 @@ public class recommendCafes {
     	
     	recommendCafes dishpop = new recommendCafes();
     	
-    	if(cat==1) {
-    		if(m_obj.app_ingr_to_dish.containsKey(ing) && m_obj.app_ingr_to_dish.get(ing).size()>0) {
-    			for(String dish: m_obj.app_ingr_to_dish.get(ing)) {
-            		if(bst_1.getCount(ing)>0) {
-            			Float pop = (float) bst_1.getCount(ing);
-	            		dishpop.addDish(dish, (String) m_obj.app_dish_to_price.get(dish)[1] , -pop); // sort in decreasing order so minus
-            		}
-            	}
-    		}
-    		
-    		if(c_obj.app_ingr_to_dish.containsKey(ing) && c_obj.app_ingr_to_dish.get(ing).size()>0) {
-    			for(String dish: c_obj.app_ingr_to_dish.get(ing)) {
-    				if(bst_2.getCount(ing)>0) {
-    					Float pop = (float) bst_2.getCount(ing);
-    					dishpop.addDish(dish, (String) c_obj.app_dish_to_price.get(dish)[1] , -pop);
-    				}
-            	}
-    		}
-    		
-    		if(a_obj.app_ingr_to_dish.containsKey(ing) && a_obj.app_ingr_to_dish.get(ing).size()>0) {
-    			for(String dish: a_obj.app_ingr_to_dish.get(ing)) {
-    				if(bst_3.getCount(ing)>0) {
-    					Float pop = (float) bst_3.getCount(ing);
-    					dishpop.addDish(dish, (String) a_obj.app_dish_to_price.get(dish)[1] , -pop);
-    				}
-            	}
-    		}
-    	}
-    	else if(cat==2) {
-    		if(m_obj.mcr_ingr_to_dish.containsKey(ing) && m_obj.mcr_ingr_to_dish.get(ing).size()>0) {
-    			for(String dish: m_obj.mcr_ingr_to_dish.get(ing)) {
-            		if(bst_1.getCount(ing)>0) {
-            			Float pop = (float) bst_1.getCount(ing);
-	            		dishpop.addDish(dish, (String) m_obj.mcr_dish_to_price.get(dish)[1] , -pop); // sort in decreasing order so minus
-            		}
-            	}
-    		}
-    		
-    		if(c_obj.mcr_ingr_to_dish.containsKey(ing) && c_obj.mcr_ingr_to_dish.get(ing).size()>0) {
-    			for(String dish: c_obj.mcr_ingr_to_dish.get(ing)) {
-    				if(bst_2.getCount(ing)>0) {
-    					Float pop = (float) bst_2.getCount(ing);
-    					dishpop.addDish(dish, (String) c_obj.mcr_dish_to_price.get(dish)[1] , -pop);
-    				}
-            	}
-    		}
-    		
-    		if(a_obj.mcr_ingr_to_dish.containsKey(ing) && a_obj.mcr_ingr_to_dish.get(ing).size()>0) {
-    			for(String dish: a_obj.mcr_ingr_to_dish.get(ing)) {
-    				if(bst_3.getCount(ing)>0) {
-    					Float pop = (float) bst_3.getCount(ing);
-    					dishpop.addDish(dish, (String) a_obj.mcr_dish_to_price.get(dish)[1] , -pop);
-    				}
-            	}
-    		}
-    	}
-    	else {
-    		if(m_obj.bev_ingr_to_dish.containsKey(ing) && m_obj.bev_ingr_to_dish.get(ing).size()>0) {
-    			for(String dish: m_obj.bev_ingr_to_dish.get(ing)) {
-            		if(bst_1.getCount(ing)>0) {
-            			Float pop = (float) bst_1.getCount(ing);
-	            		dishpop.addDish(dish, (String) m_obj.bev_dish_to_price.get(dish)[1] , -pop); // sort in decreasing order so minus
-            		}
-            	}
-    		}
-    		
-    		if(c_obj.bev_ingr_to_dish.containsKey(ing) && c_obj.bev_ingr_to_dish.get(ing).size()>0) {
-    			for(String dish: c_obj.bev_ingr_to_dish.get(ing)) {
-    				if(bst_2.getCount(ing)>0) {
-    					Float pop = (float) bst_2.getCount(ing);
-    					dishpop.addDish(dish, (String) c_obj.bev_dish_to_price.get(dish)[1] , -pop);
-    				}
-            	}
-    		}
-    		
-    		if(a_obj.bev_ingr_to_dish.containsKey(ing) && a_obj.bev_ingr_to_dish.get(ing).size()>0) {
-    			for(String dish: a_obj.bev_ingr_to_dish.get(ing)) {
-    				if(bst_3.getCount(ing)>0) {
-    					Float pop = (float) bst_3.getCount(ing);
-    					dishpop.addDish(dish, (String) a_obj.bev_dish_to_price.get(dish)[1] , -pop);
-    				}
-            	}
-    		}
-    	}
+    	if (cat == 1) {
+            addDishesToQueue(ing, m_obj.app_ingr_to_dish, m_obj.app_dish_to_price, bst_1, dishpop);
+            addDishesToQueue(ing, c_obj.app_ingr_to_dish, c_obj.app_dish_to_price, bst_2, dishpop);
+            addDishesToQueue(ing, a_obj.app_ingr_to_dish, a_obj.app_dish_to_price, bst_3, dishpop);
+        } else if (cat == 2) {
+            addDishesToQueue(ing, m_obj.mcr_ingr_to_dish, m_obj.mcr_dish_to_price, bst_1, dishpop);
+            addDishesToQueue(ing, c_obj.mcr_ingr_to_dish, c_obj.mcr_dish_to_price, bst_2, dishpop);
+            addDishesToQueue(ing, a_obj.mcr_ingr_to_dish, a_obj.mcr_dish_to_price, bst_3, dishpop);
+        } else {
+            addDishesToQueue(ing, m_obj.bev_ingr_to_dish, m_obj.bev_dish_to_price, bst_1, dishpop);
+            addDishesToQueue(ing, c_obj.bev_ingr_to_dish, c_obj.bev_dish_to_price, bst_2, dishpop);
+            addDishesToQueue(ing, a_obj.bev_ingr_to_dish, a_obj.bev_dish_to_price, bst_3, dishpop);
+        }
     	
     	// Retrieving and displaying the dish with the lowest price
     	System.out.println();
 		System.out.println("RECOMMENDATION BY POPULARITY (HIGH TO LOW)");
 		System.out.println("------------------------------------------------------");
     	System.out.println();
-    	System.out.println("DISH\t\t\t\t\t\t\t\t\t\t CAFE");
+    	System.out.println("RANK\t\tDISH\t\t\t\t\t\t\t\t\t CAFE");
     	System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------");
+    	int rank = 1;
+    	Map<String, Float> cafeRanks = new HashMap<>(); // Map to store cafe ranks
     	while (!dishpop.isEmpty()) {
-    	    Dish lowestPriceDish = dishpop.getLowestPriceDish();
-    	    System.out.printf("%-70s %-50s%n", lowestPriceDish.dishName, lowestPriceDish.cafeName);
+    		Dish lowestPriceDish = dishpop.getLowestPriceDish();
+            String cafeName = lowestPriceDish.cafeName;
+
+            // Print cafe rank only if it's the first occurrence of the cafe in the loop
+            if (!cafeRanks.containsKey(cafeName)) {
+                cafeRanks.put(cafeName, (float) rank);
+                System.out.printf("%-5d\t\t%-70s %-50s%n", rank, lowestPriceDish.dishName, cafeName);
+                rank++;
+            } else {
+                System.out.printf("%-5s\t\t%-70s %-50s%n", "", lowestPriceDish.dishName, cafeName);
+            }
     	}
     }
     

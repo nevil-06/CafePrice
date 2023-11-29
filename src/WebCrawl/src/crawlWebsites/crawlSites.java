@@ -15,11 +15,8 @@ public class crawlSites {
 
 	public static void writeContent(String folderName, String content, String fileName, String extension){
 		try {
-			System.out.println("Here");
 			File f = new File(folderName + fileName + extension);
-			System.out.println("Here");
 			FileWriter writer = new FileWriter(f, false);
-			System.out.println("Here");
 			writer.write(content);
 			System.out.println("Report Created is in Location : " + f.getAbsolutePath());
 			writer.close();

@@ -5,6 +5,9 @@ import stopwords.manageStopwords;
 import java.io.*;
 import java.text.Normalizer;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.jsoup.*;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -147,15 +150,27 @@ public class medina {
 			for(String s: res)
 			{
 				String ing = s.trim().toLowerCase();
-				List<String> check_plural = Arrays.asList("eggs","onions","mushrooms","tomatoes","peppers","olives");
-				List<String> check_plural_2 = Arrays.asList("potatoes");
+//				List<String> check_plural = Arrays.asList("eggs","onions","mushrooms","tomatoes","peppers","olives");
+				List<String> check_plural_2 = Arrays.asList("potatoes","tomatoes");
 
-				if(check_plural.contains(ing)) {
-					ing = ing.substring(0, ing.length()-1);
-				}
-				else if(check_plural_2.contains(ing)) {
+//				if(check_plural.contains(ing)) {
+//					ing = ing.substring(0, ing.length()-1);
+//				}
+//				else if(check_plural_2.contains(ing)) {
+//					ing = ing.substring(0, ing.length()-2);
+//				}
+				
+				// Create a pattern for ingredients with an optional 's' at the end
+		        Pattern pluralPattern = Pattern.compile("(.*?)(s)?$");
+		        Matcher matcher = pluralPattern.matcher(ing);
+
+		        if(check_plural_2.contains(ing)) {
 					ing = ing.substring(0, ing.length()-2);
-				}
+				}	
+		        else if (matcher.matches()) {
+		            // If it matches the pattern, remove the 's' or 'es' at the end
+		            ing = matcher.group(1);
+		        }
 				
 				//TB Added: stopword functionality by using search() function
 				
@@ -177,8 +192,8 @@ public class medina {
 //		System.out.println("Size of map: " + mcr_dish_to_price.size());
 
 //		for (Map.Entry<String, Set<String>> set : mcr_ingr_to_dish.entrySet()) {
-////			 
-////            // Printing all elements of a Map
+//			 
+//            // Printing all elements of a Map
 //            System.out.print(set.getKey() + " dishes are: ");
 ////            System.out.print(set.getKey().length() + " is dish size ");
 ////            System.out.print(set.getKey() + " dishes size is : " + set.getValue().size() + " and dishes: ");
@@ -212,6 +227,26 @@ public class medina {
 			}
 			
 //			System.out.print(dish);
+			
+//			String input = e1.getElementsByClass("menu-item-description").text();
+//
+//	        // Define the regex pattern for splitting
+//	        String regex = "\\s*[^a-zA-Z]+\\s*";
+//
+//	        // Create a Pattern object
+//	        Pattern pattern = Pattern.compile(regex);
+//
+//	        // Create a Matcher object
+//	        Matcher matcher = pattern.matcher(input);
+//
+//	        // Process the matches
+//	        ArrayList<String> res_updated = new ArrayList<>();
+//	        while (matcher.find()) {
+//	            String ing = matcher.group().trim().toLowerCase();
+//	            if (ing.length() > 0 && !obj.stopword_tree.search(ing)) {
+//	                res_updated.add(ing);
+//	            }
+//	        }
 			
 			String[] res = e1.getElementsByClass("menu-item-description").text().split("\\s*[^a-zA-Z]+\\s*");
 			
@@ -291,16 +326,16 @@ public class medina {
 			}
 		}
 		
-//		for (Map.Entry<String, Set<String>> set : bev_ingr_to_dish.entrySet()) {
-//			 
-//            // Printing all elements of a Map
-//            System.out.print(set.getKey() + " Beverages are: ");
-//            System.out.print(set.getKey().length() + " is Beverages size ");
-//            for(String s: set.getValue()) {
-//            	System.out.print(s + " , ");
-//            }
-//            System.out.println();
-//        }
+		for (Map.Entry<String, Set<String>> set : bev_ingr_to_dish.entrySet()) {
+			 
+            // Printing all elements of a Map
+            System.out.print(set.getKey() + " Beverages are: ");
+            System.out.print(set.getKey().length() + " is Beverages size ");
+            for(String s: set.getValue()) {
+            	System.out.print(s + " , ");
+            }
+            System.out.println();
+        }
 		
 //		for (Map.Entry<String, Object[]> set : bev_dish_to_price.entrySet()) {
 //			 
